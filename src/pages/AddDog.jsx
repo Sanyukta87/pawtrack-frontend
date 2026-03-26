@@ -30,10 +30,22 @@ function AddDog() {
     e.preventDefault();
 
     try {
-      await API.post("/dogs/add", formData);
+      console.log("Sending data:", formData);
+
+      const token = localStorage.getItem("token");
+
+const res = await API.post("/api/dogs", formData, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
+
+      console.log("Response:", res.data);
+
       alert("Dog Added 🐶");
-      navigate("/dashboard");
+      navigate("/admin");
     } catch (err) {
+      console.error(err);
       alert("Error ❌");
     }
   };
@@ -97,7 +109,9 @@ const input = {
   padding: "10px",
   marginBottom: "10px",
   borderRadius: "8px",
-  border: "none"
+  border: "none",
+  color: "#000",              // ✅ TEXT COLOR FIX
+  backgroundColor: "#fff",    // ✅ ensure contrast
 };
 
 const button = {

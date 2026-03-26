@@ -1,19 +1,58 @@
 dogs.map((dog) => (
   <div
     key={dog._id}
-    style={{
-      border: "1px solid black",
-      padding: "15px",
-      margin: "15px",
-    }}
+    className="bg-white rounded-2xl shadow-md p-5 hover:shadow-xl transition"
   >
-    {/* 👇 ADD THIS */}
-    <h3>Name: {dog.name}</h3>
-    <p>Location: {dog.location}</p>
+    {/* 🐶 Name */}
+    <h3 className="text-xl font-bold text-gray-800">
+      {dog.name}
+    </h3>
 
-    {/* 👇 QR CLICKABLE */}
+    {/* 📍 Location */}
+    <p className="text-gray-600 mt-1">
+      📍 {dog.location}
+    </p>
+
+    {/* ❤️ Health Status */}
+    <p
+      className={`mt-2 font-semibold ${
+        dog.healthStatus === "Healthy"
+          ? "text-green-600"
+          : "text-red-500"
+      }`}
+    >
+      {dog.healthStatus || "Unknown"}
+    </p>
+
+    {/* 🔳 QR Code */}
     <Link to={`/dog/${dog._id}`}>
-      <img src={dog.qrCode} alt="QR Code" width="120" />
+      <img
+        src={dog.qrCode}
+        alt="QR Code"
+        className="w-24 mt-3 cursor-pointer"
+      />
     </Link>
+
+    {/* 🔘 Actions */}
+    <div className="flex gap-2 mt-4">
+      <Link
+        to={`/dog/${dog._id}`}
+        className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+      >
+        View
+      </Link>
+
+      <button
+        className="bg-yellow-500 text-white px-3 py-1 rounded text-sm"
+      >
+        Edit
+      </button>
+
+      <button
+        className="bg-red-500 text-white px-3 py-1 rounded text-sm"
+      >
+        Delete
+      </button>
+    </div>
   </div>
 ))

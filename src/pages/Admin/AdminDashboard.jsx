@@ -21,7 +21,7 @@ function AdminDashboard() {
   const fetchDogs = async () => {
     setLoading(true);
     try {
-      const res = await API.get("/dogs");
+      const res = await API.get("/api/dogs");
       setDogs(res.data);
     } catch (err) {
       console.error(err);

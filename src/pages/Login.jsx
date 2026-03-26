@@ -20,10 +20,10 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await API.post("/auth/login", {
-        email,
-        password,
-      });
+      const res = await API.post("/api/auth/login", {
+  email,
+  password,
+});
 
       const { token, role, user } = res.data;
 
@@ -135,6 +135,7 @@ const inputStyle = {
   borderRadius: "8px",
   border: "none",
   outline: "none",
+  color: "black", // 👈 ADD THIS
 };
 
 const buttonStyle = {
