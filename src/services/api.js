@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://pawtrack-backend-5bbx.onrender.com/api",
+  baseURL: "https://pawtrack-backend-5bbx.onrender.com",
 });
 // 🔐 Token interceptor
 API.interceptors.request.use((req) => {

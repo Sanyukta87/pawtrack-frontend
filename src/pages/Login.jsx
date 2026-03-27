@@ -19,12 +19,11 @@ function Login() {
 
     setLoading(true);
 
-    try {
-      const res = await API.post("/api/auth/login", {
+try {  
+   const res = await API.post("/api/auth/login", {
   email,
   password,
-});
-
+    });
       const { token, role, user } = res.data;
 
       // 🔥 STORE EVERYTHING CLEANLY
