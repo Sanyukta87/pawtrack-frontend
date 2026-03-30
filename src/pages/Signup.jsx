@@ -16,7 +16,7 @@ function Signup() {
     e.preventDefault();
 
     try {
-       await API.post("/auth/signup", form);
+       await API.post("/api/auth/signup", form);
       alert("Signup successful 🎉");
       navigate("/login");
     } catch (err) {

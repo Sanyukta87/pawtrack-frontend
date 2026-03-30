@@ -14,7 +14,7 @@ function DogDetails() {
 
   const fetchDog = async () => {
     try {
-      const res = await API.get(`/dogs/${id}`);
+      const res = await API.get(`/api/dogs/${id}`);
       setDog(res.data);
     } catch (err) {
       console.log(err);
@@ -30,7 +30,7 @@ function DogDetails() {
     if (!report) return alert("Enter something");
 
     try {
-      await API.post(`/dogs/report/${id}`, { message: report });
+      await API.post(`/api/dogs/report/${id}`, { message: report });
       alert("Reported successfully 🚨");
       setReport("");
       fetchDog();
@@ -44,7 +44,7 @@ function DogDetails() {
     if (!treatment) return alert("Enter treatment");
 
     try {
-      await API.post(`/dogs/health/${id}`, {
+      await API.post(`/api/dogs/health/${id}`, {
         treatment,
         notes,
         type: "treatment" // default
@@ -260,3 +260,5 @@ const listItem = {
 };
 
 export default DogDetails;
+
+

@@ -34,7 +34,7 @@ function AdminDashboard() {
     if (!window.confirm("Delete this dog?")) return;
 
     try {
-      await API.delete(`/dogs/${id}`);
+      await API.delete(`/api/dogs/${id}`);
       setDogs(dogs.filter((dog) => dog._id !== id));
     } catch {
       alert("Delete failed ❌");
@@ -43,7 +43,7 @@ function AdminDashboard() {
 
   const updateDog = async () => {
     try {
-      await API.put(`/dogs/update/${editDog._id}`, editDog);
+      await API.put(`/api/dogs/update/${editDog._id}`, editDog);
       alert("Updated ✅");
       setEditDog(null);
       fetchDogs();

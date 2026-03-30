@@ -1,13 +1,14 @@
 import axios from "axios";
 
+const rawBaseUrl =
+  import.meta.env.VITE_API_BASE_URL || "https://pawtrack-backend-5bbx.onrender.com";
+
 const API = axios.create({
-  baseURL: "https://pawtrack-backend-5bbx.onrender.com",
+  baseURL: rawBaseUrl.replace(/\/+$/, ""),
 });
-// 🔐 Token interceptor
+
 API.interceptors.request.use((req) => {
   const token = localStorage.getItem("token");
-
-  console.log("TOKEN BEING SENT:", token);
 
   if (token) {
     req.headers.Authorization = `Bearer ${token}`;

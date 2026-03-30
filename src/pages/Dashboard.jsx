@@ -15,7 +15,7 @@ function Dashboard() {
   useEffect(() => {
     const fetchDogs = async () => {
       try {
-        const res = await API.get("/dogs");
+        const res = await API.get("/api/dogs");
         setDogs(res.data);
       } catch (err) {
         console.log(err);

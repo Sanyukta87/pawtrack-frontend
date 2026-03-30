@@ -8,7 +8,7 @@ function DogsPage() {
   // 📥 Fetch all dogs
   const fetchDogs = async () => {
     try {
-      const res = await API.get("/dogs");
+      const res = await API.get("/api/dogs");
       console.log("DOG DATA 👉", res.data); // 👈 debug
       setDogs(res.data);
     } catch (err) {
@@ -23,7 +23,7 @@ function DogsPage() {
   // 🗑 Delete function
   const handleDelete = async (id) => {
     try {
-      await API.delete(`/dogs/${id}`);
+      await API.delete(`/api/dogs/${id}`);
       setDogs(dogs.filter((dog) => dog._id !== id));
     } catch (err) {
       console.log(err);
