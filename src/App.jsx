@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import Login from "./pages/Login";
@@ -6,7 +7,7 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import AddDog from "./pages/AddDog";
 import DogDetails from "./pages/DogDetails";
-import QRScanner from "./pages/QRScanner";
+import Scanner from "./pages/Scanner";
 import DogsPage from "./pages/DogsPage";
 
 // import Navbar from "./components/Navbar"; // optional
@@ -14,6 +15,28 @@ import DogsPage from "./pages/DogsPage";
 function App() {
   return (
     <BrowserRouter>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3500,
+          style: {
+            borderRadius: "18px",
+            background: "#0f172a",
+            color: "#fff",
+            boxShadow: "0 16px 35px rgba(15,23,42,0.18)",
+          },
+          success: {
+            style: {
+              background: "#14532d",
+            },
+          },
+          error: {
+            style: {
+              background: "#7f1d1d",
+            },
+          },
+        }}
+      />
       {/* <Navbar /> */}
 
       <Routes>
@@ -30,10 +53,9 @@ function App() {
         {/* 🐶 Dog System */}
         <Route path="/dogs" element={<DogsPage />} />   {/* ✅ FIXED */}
         <Route path="/add-dog" element={<AddDog />} />
-        <Route path="/dog/:id" element={<DogDetails />} />
-
+        <Route path="/dog/:dogId" element={<DogDetails />} />
         {/* 📷 QR Scanner */}
-        <Route path="/scan" element={<QRScanner />} />
+        <Route path="/scan" element={<Scanner />} />
 
         {/* 🚨 Alerts (placeholder for now) */}
         <Route path="/alerts" element={<div>Alerts Page</div>} />

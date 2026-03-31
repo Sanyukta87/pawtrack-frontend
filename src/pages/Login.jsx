@@ -1,39 +1,39 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import Input from "../components/ui/Input";
 import API from "../services/api";
-import { useTheme } from "../context/ThemeContext";
 
 function Login() {
-  const { darkMode } = useTheme();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async (event) => {
+    event.preventDefault();
 
-    if (loading) return;
+    if (loading) {
+      return;
+    }
 
     setLoading(true);
 
-try {  
-   const res = await API.post("/api/auth/login", {
-  email,
-  password,
-    });
-      const { token, role, user } = res.data;
+    try {
+      const response = await API.post("/api/auth/login", {
+        email,
+        password,
+      });
 
-      // 🔥 STORE EVERYTHING CLEANLY
+      const { token, role, user } = response.data;
       localStorage.setItem("token", token);
       localStorage.setItem("role", role);
       localStorage.setItem("user", JSON.stringify(user));
 
-      alert("Login successful 🔥");
+      toast.success("Login successful");
 
-      // 🚀 ROLE BASED REDIRECT
       switch (role) {
         case "admin":
           navigate("/admin");
@@ -47,105 +47,65 @@ try {
         default:
           navigate("/");
       }
-
-    } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.msg || "Login Failed ❌");
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.msg || "Login failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: darkMode
-          ? "linear-gradient(135deg, #1e1e2f, #121212)"
-          : "linear-gradient(135deg, #6c5ce7, #a29bfe)",
-        fontFamily: "Arial",
-      }}
-    >
-      <div
-        style={{
-          width: "320px",
-          padding: "30px",
-          borderRadius: "16px",
-          backdropFilter: "blur(10px)",
-          background: darkMode
-            ? "rgba(255,255,255,0.05)"
-            : "rgba(255,255,255,0.2)",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
-          textAlign: "center",
-          color: "white",
-        }}
-      >
-        <h2 style={{ marginBottom: "10px" }}>🐶 PawTrack</h2>
-        <p style={{ marginBottom: "20px", fontSize: "14px" }}>
-          Welcome back 👋
-        </p>
+    <div className="app-shell flex min-h-screen items-center justify-center p-6">
+      <Card className="w-full max-w-md border-white/70 bg-white/90 backdrop-blur">
+        <div className="mb-8 text-center">
+          <span className="inline-flex rounded-full border border-sky-100 bg-sky-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-sky-700">
+            PawTrack
+          </span>
+          <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-900">
+            Welcome back
+          </h1>
+          <p className="mt-2 text-sm text-slate-500">
+            Sign in to manage dogs, reports, and health records.
+          </p>
+        </div>
 
-        <form onSubmit={handleLogin}>
-          <input
+        <form className="space-y-4" onSubmit={handleLogin}>
+          <Input
             type="email"
-            placeholder="Email"
+            label="Email"
+            placeholder="you@example.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(event) => setEmail(event.target.value)}
             required
-            style={inputStyle}
           />
-
-          <input
+          <Input
             type="password"
-            placeholder="Password"
+            label="Password"
+            placeholder="Enter your password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(event) => setPassword(event.target.value)}
             required
-            style={inputStyle}
           />
 
-          <button style={buttonStyle} disabled={loading}>
-            {loading ? "Logging in..." : "Login"}
-          </button>
+          <Button type="submit" className="w-full" loading={loading}>
+            Login
+          </Button>
         </form>
 
-        {/* SIGNUP NAVIGATION */}
-        <p style={{ marginTop: "15px", fontSize: "14px" }}>
-          Don’t have an account?{" "}
-          <span
-            style={{ color: "#ffeaa7", cursor: "pointer" }}
+        <p className="mt-6 text-center text-sm text-slate-500">
+          Don&apos;t have an account?{" "}
+          <button
+            className="font-semibold text-sky-700 transition hover:text-sky-600"
             onClick={() => navigate("/signup")}
+            type="button"
           >
             Sign up
-          </span>
+          </button>
         </p>
-      </div>
+      </Card>
     </div>
   );
 }
-
-const inputStyle = {
-  width: "100%",
-  padding: "10px",
-  marginBottom: "10px",
-  borderRadius: "8px",
-  border: "none",
-  outline: "none",
-  color: "black", // 👈 ADD THIS
-};
-
-const buttonStyle = {
-  width: "100%",
-  padding: "10px",
-  backgroundColor: "#fd79a8",
-  color: "white",
-  border: "none",
-  borderRadius: "8px",
-  cursor: "pointer",
-  marginTop: "10px",
-};
 
 export default Login;

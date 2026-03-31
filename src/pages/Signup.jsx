@@ -1,5 +1,9 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import Input from "../components/ui/Input";
 import API from "../services/api";
 
 function Signup() {
@@ -9,83 +13,96 @@ function Signup() {
     password: "",
     role: "volunteer",
   });
-
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSignup = async (e) => {
-    e.preventDefault();
+  const handleSignup = async (event) => {
+    event.preventDefault();
+
+    if (loading) {
+      return;
+    }
+
+    setLoading(true);
 
     try {
-       await API.post("/api/auth/signup", form);
-      alert("Signup successful 🎉");
+      await API.post("/api/auth/signup", form);
+      toast.success("Signup successful");
       navigate("/login");
-    } catch (err) {
-      alert("Signup failed ❌");
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.msg || "Signup failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-purple-500 to-blue-500">
-      <div className="bg-white/80 backdrop-blur-lg p-8 rounded-2xl w-80 shadow-xl text-center">
+    <div className="app-shell flex min-h-screen items-center justify-center p-6">
+      <Card className="w-full max-w-md border-white/70 bg-white/90 backdrop-blur">
+        <div className="mb-8 text-center">
+          <span className="inline-flex rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
+            PawTrack
+          </span>
+          <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-900">
+            Create your account
+          </h1>
+          <p className="mt-2 text-sm text-slate-500">
+            Join the team and start tracking dogs professionally.
+          </p>
+        </div>
 
-        <h2 className="text-xl font-bold mb-4">🐶 PawTrack Signup</h2>
-
-        <form onSubmit={handleSignup}>
-
-          <input
-            placeholder="Name"
-            onChange={(e) =>
-              setForm({ ...form, name: e.target.value })
-            }
-            className="w-full p-3 mb-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-purple-400"
+        <form className="space-y-4" onSubmit={handleSignup}>
+          <Input
+            label="Full Name"
+            placeholder="Enter your name"
+            value={form.name}
+            onChange={(event) => setForm({ ...form, name: event.target.value })}
+            required
           />
-
-          <input
-            placeholder="Email"
-            onChange={(e) =>
-              setForm({ ...form, email: e.target.value })
-            }
-            className="w-full p-3 mb-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-purple-400"
+          <Input
+            type="email"
+            label="Email"
+            placeholder="you@example.com"
+            value={form.email}
+            onChange={(event) => setForm({ ...form, email: event.target.value })}
+            required
           />
-
-          <input
+          <Input
             type="password"
-            placeholder="Password"
-            onChange={(e) =>
-              setForm({ ...form, password: e.target.value })
-            }
-            className="w-full p-3 mb-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-purple-400"
+            label="Password"
+            placeholder="Create a password"
+            value={form.password}
+            onChange={(event) => setForm({ ...form, password: event.target.value })}
+            required
           />
-
-          {/* ✅ SINGLE ROLE DROPDOWN */}
-          <select
+          <Input
+            as="select"
+            label="Role"
             value={form.role}
-            onChange={(e) =>
-              setForm({ ...form, role: e.target.value })
-            }
-            className="w-full p-3 mb-4 rounded-xl border bg-white/80"
+            onChange={(event) => setForm({ ...form, role: event.target.value })}
           >
             <option value="volunteer">Volunteer</option>
             <option value="vet">Vet / Hospital</option>
             <option value="admin">Admin</option>
-          </select>
+          </Input>
 
-          <button className="w-full bg-gradient-to-r from-purple-500 to-blue-500 text-white py-2 rounded-xl hover:scale-105 transition">
-            Signup
-          </button>
+          <Button type="submit" className="w-full" loading={loading}>
+            Sign up
+          </Button>
         </form>
 
-        <p className="mt-4 text-sm">
+        <p className="mt-6 text-center text-sm text-slate-500">
           Already have an account?{" "}
-          <span
-            className="text-blue-600 cursor-pointer"
+          <button
+            className="font-semibold text-emerald-700 transition hover:text-emerald-600"
             onClick={() => navigate("/login")}
+            type="button"
           >
             Login
-          </span>
+          </button>
         </p>
-
-      </div>
+      </Card>
     </div>
   );
 }

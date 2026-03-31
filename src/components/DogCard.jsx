@@ -17,7 +17,7 @@ dogs.map((dog) => (
     <p
       className={`mt-2 font-semibold ${
         dog.healthStatus === "Healthy"
-          ? "text-green-600"
+          ? "text-yellow-600"
           : "text-red-500"
       }`}
     >
