@@ -145,7 +145,7 @@ function Dashboard() {
           />
         </div>
 
-        <div className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,0.65fr)]">
           <Card className="border-slate-200/70 bg-white/88">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
@@ -160,10 +160,10 @@ function Dashboard() {
               <Badge variant="info">Live</Badge>
             </div>
 
-            <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-              <div className="rounded-3xl border border-sky-100 bg-gradient-to-br from-sky-50 via-white to-cyan-50 p-4">
-                <div className="h-72">
-                  <ResponsiveContainer>
+            <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+              <div className="min-w-0 rounded-3xl border border-sky-100 bg-gradient-to-br from-sky-50 via-white to-cyan-50 p-4">
+                <div className="h-72 min-w-0 sm:h-80">
+                  <ResponsiveContainer height="100%" width="100%">
                     <PieChart>
                       <Pie
                         data={pieData}
@@ -225,9 +225,9 @@ function Dashboard() {
               <Badge variant="success">Updated</Badge>
             </div>
 
-            <div className="mt-6 rounded-3xl border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-sky-50 p-4">
-              <div className="h-80">
-                <ResponsiveContainer>
+            <div className="mt-6 min-w-0 rounded-3xl border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-sky-50 p-4">
+              <div className="h-72 min-w-0 sm:h-80">
+                <ResponsiveContainer height="100%" width="100%">
                   <BarChart data={barData} barCategoryGap={28}>
                     <CartesianGrid stroke="#dbeafe" strokeDasharray="3 3" />
                     <XAxis dataKey="name" stroke="#64748b" />
