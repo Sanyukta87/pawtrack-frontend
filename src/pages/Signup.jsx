@@ -26,9 +26,15 @@ function Signup() {
     setLoading(true);
 
     try {
-      await API.post("/api/auth/signup", form);
-      toast.success("Signup successful");
-      navigate("/login");
+      const response = await API.post("/api/auth/signup", form);
+      toast.success(response.data.msg || "Signup successful");
+      navigate("/verify-email", {
+        state: {
+          email: form.email,
+          verificationRequired: Boolean(response.data.verificationRequired),
+          verificationUrl: response.data.verificationUrl || "",
+        },
+      });
     } catch (error) {
       console.error(error);
       toast.error(error.response?.data?.msg || "Signup failed");

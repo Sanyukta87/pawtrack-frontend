@@ -22,6 +22,11 @@ const PIE_COLORS = ["#0ea5e9", "#10b981", "#f59e0b", "#f43f5e"];
 const BAR_COLORS = ["#10b981", "#0ea5e9", "#f59e0b", "#f43f5e"];
 
 const getDogRouteId = (dog) => dog?.dogId || dog?._id;
+const normalizeDogIdValue = (value) =>
+  String(value || "")
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "");
 
 function AdminDashboard() {
   const navigate = useNavigate();
@@ -35,6 +40,7 @@ function AdminDashboard() {
     activeReports: 0,
   });
   const [search, setSearch] = useState("");
+  const [searchError, setSearchError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
 
@@ -64,11 +70,31 @@ function AdminDashboard() {
 
   const filteredDogs = useMemo(
     () =>
-      dogs.filter((dog) =>
-        dog.name?.toLowerCase().includes(search.toLowerCase())
-      ),
+      dogs.filter((dog) => {
+        const normalizedSearch = normalizeDogIdValue(search);
+
+        if (!normalizedSearch) {
+          return true;
+        }
+
+        return normalizeDogIdValue(dog.dogId).includes(normalizedSearch);
+      }),
     [dogs, search]
   );
+
+  const exactMatchDog = useMemo(() => {
+    const normalizedSearch = normalizeDogIdValue(search);
+
+    if (!normalizedSearch) {
+      return null;
+    }
+
+    return (
+      dogs.find(
+        (dog) => normalizeDogIdValue(dog.dogId) === normalizedSearch
+      ) || null
+    );
+  }, [dogs, search]);
 
   const safeCount =
     typeof stats.safeVaccinations === "number"
@@ -95,7 +121,7 @@ function AdminDashboard() {
 
   const attentionDogs = useMemo(
     () =>
-      dogs
+      filteredDogs
         .filter((dog) => getAlertLevel(dog) !== "safe")
         .sort((left, right) => {
           const alertRank = {
@@ -110,7 +136,7 @@ function AdminDashboard() {
           );
         })
         .slice(0, 4),
-    [dogs]
+    [filteredDogs]
   );
 
   const recentDogs = useMemo(
@@ -138,6 +164,27 @@ function AdminDashboard() {
     { name: "Attention", value: attentionCount },
   ];
 
+  const handleDogSearch = (event) => {
+    event.preventDefault();
+
+    const normalizedSearch = normalizeDogIdValue(search);
+
+    if (!normalizedSearch) {
+      setSearchError("Enter a Dog ID first.");
+      return;
+    }
+
+    const dogToOpen = exactMatchDog || filteredDogs[0];
+
+    if (!dogToOpen) {
+      setSearchError("No dog found for that Dog ID.");
+      return;
+    }
+
+    setSearchError("");
+    navigate(`/dog/${getDogRouteId(dogToOpen)}`);
+  };
+
   return (
     <div className="app-shell p-6 md:p-10">
       <div className="mx-auto max-w-7xl space-y-6">
@@ -152,17 +199,33 @@ function AdminDashboard() {
               </p>
             </div>
 
-            <div className="flex w-full flex-col gap-3 lg:max-w-2xl lg:flex-row">
-              <Input
-                className="bg-white"
-                placeholder="Search dogs by name"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-              />
-              <Button onClick={() => navigate("/dogs")} variant="secondary">
-                View Directory
-              </Button>
-              <Button onClick={() => navigate("/add-dog")}>Add Dog</Button>
+            <div className="w-full lg:max-w-2xl">
+              <form
+                className="flex w-full flex-col gap-3 lg:flex-row"
+                onSubmit={handleDogSearch}
+              >
+                <Input
+                  className="bg-white"
+                  placeholder="Enter Dog ID"
+                  value={search}
+                  onChange={(event) => {
+                    setSearch(event.target.value);
+                    setSearchError("");
+                  }}
+                />
+                <Button type="submit" variant="secondary">
+                  Find Dog
+                </Button>
+                <Button onClick={() => navigate("/dogs")} variant="secondary">
+                  View Directory
+                </Button>
+                <Button onClick={() => navigate("/add-dog")}>Add Dog</Button>
+              </form>
+              {searchError && (
+                <p className="mt-3 text-sm font-medium text-rose-600">
+                  {searchError}
+                </p>
+              )}
             </div>
           </div>
         </Card>
@@ -300,6 +363,9 @@ function AdminDashboard() {
                           <p className="mt-1 text-sm text-slate-500">
                             {dog.location || "Location not available"}
                           </p>
+                          <p className="mt-2 text-xs font-medium text-slate-500">
+                            Last seen: {formatLastSeen(dog.lastSeen)}
+                          </p>
                         </div>
                         <Badge variant={getAlertVariant(alertLevel)}>
                           {getAlertLabel(alertLevel)}
@@ -388,6 +454,9 @@ function AdminDashboard() {
                         <p className="mt-1 text-sm text-slate-500">
                           {dog.location || "Location not available"}
                         </p>
+                        <p className="mt-2 text-xs font-medium text-slate-500">
+                          Last seen: {formatLastSeen(dog.lastSeen)}
+                        </p>
                       </div>
 
                       <div className="flex items-center gap-3">
@@ -453,6 +522,20 @@ function LegendCard({ color, label, value }) {
       <p className="mt-4 text-3xl font-bold text-slate-900">{value}</p>
     </div>
   );
+}
+
+function formatLastSeen(lastSeen) {
+  if (!lastSeen?.timestamp) {
+    return "Not recorded";
+  }
+
+  const formattedTime = new Date(lastSeen.timestamp).toLocaleString();
+
+  if (lastSeen.placeName) {
+    return `${lastSeen.placeName} at ${formattedTime}`;
+  }
+
+  return formattedTime;
 }
 
 function getAlertLevel(dog) {

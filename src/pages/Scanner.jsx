@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import { useEffect, useRef, useState } from "react";
+import { Html5Qrcode } from "html5-qrcode";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 
@@ -20,16 +20,30 @@ function Scanner() {
   const { darkMode } = useTheme();
   const [dogId, setDogId] = useState("");
   const [scanError, setScanError] = useState("");
+  const [scanStatus, setScanStatus] = useState("Starting camera...");
+  const scannerRef = useRef(null);
+  const hasNavigatedRef = useRef(false);
 
   useEffect(() => {
-    const scanner = new Html5QrcodeScanner(
-      "reader",
-      { fps: 10, qrbox: 220 },
-      false
-    );
+    let isMounted = true;
 
-    scanner.render(
-      (decodedText) => {
+    const startScanner = async () => {
+      const scanner = new Html5Qrcode("reader");
+      scannerRef.current = scanner;
+
+      const qrbox = (viewfinderWidth, viewfinderHeight) => {
+        const minEdge = Math.min(viewfinderWidth, viewfinderHeight, 320);
+        return {
+          width: Math.max(180, Math.floor(minEdge * 0.8)),
+          height: Math.max(180, Math.floor(minEdge * 0.8)),
+        };
+      };
+
+      const onScanSuccess = (decodedText) => {
+        if (hasNavigatedRef.current) {
+          return;
+        }
+
         const scannedDogId = extractDogId(decodedText);
 
         if (!scannedDogId) {
@@ -37,13 +51,96 @@ function Scanner() {
           return;
         }
 
+        hasNavigatedRef.current = true;
         navigate(`/dog/${scannedDogId}`);
-      },
-      () => {}
-    );
+      };
+
+      try {
+        await scanner.start(
+          { facingMode: { ideal: "environment" } },
+          {
+            fps: 10,
+            qrbox,
+            aspectRatio: 1,
+            rememberLastUsedCamera: true,
+            showTorchButtonIfSupported: true,
+            showZoomSliderIfSupported: true,
+          },
+          onScanSuccess,
+          () => {}
+        );
+
+        if (!isMounted) {
+          return;
+        }
+
+        setScanError("");
+        setScanStatus("Point your camera at the dog's QR code.");
+      } catch (initialError) {
+        try {
+          const devices = await Html5Qrcode.getCameras();
+
+          if (!devices.length) {
+            throw initialError;
+          }
+
+          const preferredCamera =
+            devices.find((device) =>
+              /back|rear|environment/i.test(device.label || "")
+            ) || devices[0];
+
+          await scanner.start(
+            preferredCamera.id,
+            {
+              fps: 10,
+              qrbox,
+              aspectRatio: 1,
+              rememberLastUsedCamera: true,
+              showTorchButtonIfSupported: true,
+              showZoomSliderIfSupported: true,
+            },
+            onScanSuccess,
+            () => {}
+          );
+
+          if (!isMounted) {
+            return;
+          }
+
+          setScanError("");
+          setScanStatus("Point your camera at the dog's QR code.");
+        } catch (fallbackError) {
+          console.error(fallbackError);
+
+          if (!isMounted) {
+            return;
+          }
+
+          setScanStatus("Camera unavailable");
+          setScanError(
+            "Camera access failed on this device. Allow camera permission and reload the page."
+          );
+        }
+      }
+    };
+
+    startScanner();
 
     return () => {
-      scanner.clear().catch(() => {});
+      isMounted = false;
+      hasNavigatedRef.current = false;
+
+      if (scannerRef.current) {
+        const scanner = scannerRef.current;
+        scannerRef.current = null;
+
+        scanner
+          .stop()
+          .catch(() => {})
+          .finally(() => {
+            scanner.clear().catch(() => {});
+          });
+      }
     };
   }, [navigate]);
 
@@ -132,7 +229,19 @@ function Scanner() {
           }}
         >
           <h2 style={{ fontSize: "24px", marginBottom: "14px" }}>Scan QR Code</h2>
-          <div id="reader" style={{ width: "100%" }} />
+          <p
+            style={{
+              color: darkMode ? "#94a3b8" : "#64748b",
+              lineHeight: 1.6,
+              marginBottom: "14px",
+            }}
+          >
+            {scanStatus}
+          </p>
+          <div
+            id="reader"
+            style={{ width: "100%", minHeight: "320px", overflow: "hidden" }}
+          />
         </div>
       </div>
     </div>

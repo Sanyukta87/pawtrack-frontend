@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
+import ProtectedRoute from "./components/ProtectedRoute";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -9,8 +10,8 @@ import AddDog from "./pages/AddDog";
 import DogDetails from "./pages/DogDetails";
 import Scanner from "./pages/Scanner";
 import DogsPage from "./pages/DogsPage";
-
-// import Navbar from "./components/Navbar"; // optional
+import Lookup from "./pages/Lookup";
+import VerifyEmail from "./pages/VerifyEmail";
 
 function App() {
   return (
@@ -37,27 +38,64 @@ function App() {
           },
         }}
       />
-      {/* <Navbar /> */}
 
       <Routes>
-        {/* 🔐 Auth */}
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
 
-        {/* 👥 Role Dashboards */}
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/vet" element={<Dashboard />} />
-        <Route path="/volunteer" element={<Dashboard />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/vet"
+          element={
+            <ProtectedRoute allowedRoles={["vet"]}>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/volunteer" element={<Lookup />} />
 
-        {/* 🐶 Dog System */}
-        <Route path="/dogs" element={<DogsPage />} />   {/* ✅ FIXED */}
-        <Route path="/add-dog" element={<AddDog />} />
-        <Route path="/dog/:dogId" element={<DogDetails />} />
-        {/* 📷 QR Scanner */}
-        <Route path="/scan" element={<Scanner />} />
-
-        {/* 🚨 Alerts (placeholder for now) */}
+        <Route
+          path="/dogs"
+          element={
+            <ProtectedRoute allowedRoles={["admin", "vet"]}>
+              <DogsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/add-dog"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AddDog />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dog/:dogId"
+          element={
+            <ProtectedRoute allowedRoles={["admin", "vet"]}>
+              <DogDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/lookup" element={<Lookup />} />
+        <Route
+          path="/scan"
+          element={
+            <ProtectedRoute allowedRoles={["admin", "vet"]}>
+              <Scanner />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/alerts" element={<div>Alerts Page</div>} />
       </Routes>
     </BrowserRouter>

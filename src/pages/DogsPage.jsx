@@ -10,6 +10,11 @@ const formatDate = (value) =>
   value ? new Date(value).toLocaleDateString() : "N/A";
 
 const getDogRouteId = (dog) => dog.dogId || dog._id;
+const normalizeDogIdValue = (value) =>
+  String(value || "")
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "");
 
 function DogsPage() {
   const [dogs, setDogs] = useState([]);
@@ -26,10 +31,17 @@ function DogsPage() {
   }, []);
 
   const filteredDogs = useMemo(
-    () =>
-      dogs.filter((dog) =>
-        dog.name.toLowerCase().includes(search.toLowerCase())
-      ),
+    () => {
+      const normalizedSearch = normalizeDogIdValue(search);
+
+      if (!normalizedSearch) {
+        return dogs;
+      }
+
+      return dogs.filter((dog) =>
+        normalizeDogIdValue(dog.dogId).includes(normalizedSearch)
+      );
+    },
     [dogs, search]
   );
 
@@ -47,7 +59,7 @@ function DogsPage() {
 
           <div className="w-full max-w-sm">
             <Input
-              placeholder="Search dogs by name"
+              placeholder="Search dogs by Dog ID"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />

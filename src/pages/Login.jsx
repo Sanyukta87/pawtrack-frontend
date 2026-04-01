@@ -49,6 +49,9 @@ function Login() {
       }
     } catch (error) {
       console.error(error);
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      localStorage.removeItem("user");
       toast.error(error.response?.data?.msg || "Login failed");
     } finally {
       setLoading(false);

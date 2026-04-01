@@ -22,6 +22,11 @@ const PIE_COLORS = ["#0ea5e9", "#cbd5e1"];
 const BAR_COLORS = ["#f43f5e", "#f59e0b", "#10b981"];
 
 const getDogRouteId = (dog) => dog.dogId || dog._id;
+const normalizeDogIdValue = (value) =>
+  String(value || "")
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "");
 
 function Dashboard() {
   const [dogs, setDogs] = useState([]);
@@ -34,6 +39,7 @@ function Dashboard() {
     activeReports: 0,
   });
   const [search, setSearch] = useState("");
+  const [searchError, setSearchError] = useState("");
   const navigate = useNavigate();
   const role = localStorage.getItem("role");
 
@@ -53,11 +59,52 @@ function Dashboard() {
 
   const filteredDogs = useMemo(
     () =>
-      dogs.filter((dog) =>
-        dog.name.toLowerCase().includes(search.toLowerCase())
-      ),
+      dogs.filter((dog) => {
+        const normalizedSearch = normalizeDogIdValue(search);
+
+        if (!normalizedSearch) {
+          return true;
+        }
+
+        return normalizeDogIdValue(dog.dogId).includes(normalizedSearch);
+      }),
     [dogs, search]
   );
+
+  const exactMatchDog = useMemo(() => {
+    const normalizedSearch = normalizeDogIdValue(search);
+
+    if (!normalizedSearch) {
+      return null;
+    }
+
+    return (
+      dogs.find(
+        (dog) => normalizeDogIdValue(dog.dogId) === normalizedSearch
+      ) || null
+    );
+  }, [dogs, search]);
+
+  const handleDogSearch = (event) => {
+    event.preventDefault();
+
+    const normalizedSearch = normalizeDogIdValue(search);
+
+    if (!normalizedSearch) {
+      setSearchError("Enter a Dog ID first.");
+      return;
+    }
+
+    const dogToOpen = exactMatchDog || filteredDogs[0];
+
+    if (!dogToOpen) {
+      setSearchError("No dog found for that Dog ID.");
+      return;
+    }
+
+    setSearchError("");
+    navigate(`/dog/${getDogRouteId(dogToOpen)}`);
+  };
 
   const vaccinatedPercentage = stats.totalDogs
     ? Math.round((stats.vaccinatedCount / stats.totalDogs) * 100)
@@ -101,18 +148,34 @@ function Dashboard() {
               </p>
             </div>
 
-            <div className="flex w-full flex-col gap-3 lg:max-w-2xl lg:flex-row">
-              <Input
-                className="bg-white"
-                placeholder="Search dogs by name"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-              />
-              <Button onClick={() => navigate("/scan")} variant="secondary">
-                Open Scanner
-              </Button>
-              {role === "admin" && (
-                <Button onClick={() => navigate("/add-dog")}>Add Dog</Button>
+            <div className="w-full lg:max-w-2xl">
+              <form
+                className="flex w-full flex-col gap-3 lg:flex-row"
+                onSubmit={handleDogSearch}
+              >
+                <Input
+                  className="bg-white"
+                  placeholder="Enter Dog ID"
+                  value={search}
+                  onChange={(event) => {
+                    setSearch(event.target.value);
+                    setSearchError("");
+                  }}
+                />
+                <Button type="submit" variant="secondary">
+                  Find Dog
+                </Button>
+                <Button onClick={() => navigate("/scan")} variant="secondary">
+                  Open Scanner
+                </Button>
+                {role === "admin" && (
+                  <Button onClick={() => navigate("/add-dog")}>Add Dog</Button>
+                )}
+              </form>
+              {searchError && (
+                <p className="mt-3 text-sm font-medium text-rose-600">
+                  {searchError}
+                </p>
               )}
             </div>
           </div>
