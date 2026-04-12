@@ -161,7 +161,7 @@ function AddDog() {
               Created Dog Info
             </h2>
             <p className="mt-2 text-sm text-slate-500">
-              Review the generated ID and QR right after saving.
+              Review the generated Dog ID and universal lookup QR right after saving.
             </p>
           </div>
 
@@ -200,10 +200,16 @@ function AddDog() {
               {createdDog.qrCode && (
                 <div className="rounded-3xl border border-sky-100 bg-gradient-to-b from-sky-50 to-emerald-50 p-4 text-center">
                   <img
-                    alt={`${createdDog.name} QR`}
+                    alt="Universal lookup QR"
                     className="mx-auto h-48 w-48 rounded-2xl bg-white p-3 shadow-sm"
                     src={createdDog.qrCode}
                   />
+                  <p className="mt-3 text-sm font-semibold text-slate-900">
+                    Universal lookup QR
+                  </p>
+                  <p className="mt-1 text-xs font-medium uppercase tracking-[0.16em] text-slate-500">
+                    Print with Dog ID: {createdDog.dogId}
+                  </p>
                 </div>
               )}
 
@@ -218,8 +224,8 @@ function AddDog() {
             </>
           ) : (
             <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50/80 p-6 text-sm text-slate-500">
-              Submit the form to view the generated dog ID, QR code, and saved
-              profile summary.
+              Submit the form to view the generated dog ID, universal lookup QR,
+              and saved profile summary.
             </div>
           )}
         </Card>

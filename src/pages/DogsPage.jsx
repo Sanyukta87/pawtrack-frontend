@@ -53,7 +53,7 @@ function DogsPage() {
             <span className="section-chip">Directory</span>
             <h1 className="section-heading mt-3">Dogs Directory</h1>
             <p className="section-copy mt-2">
-              Browse dog IDs, vaccination status, and QR codes in one place.
+              Browse dog IDs, vaccination status, and the shared lookup QR in one place.
             </p>
           </div>
 
@@ -122,10 +122,10 @@ function DogsPage() {
                     />
                     <div>
                       <p className="text-sm font-semibold text-slate-900">
-                        Scan to open profile
+                        Universal lookup QR
                       </p>
                       <p className="mt-1 text-xs text-slate-500">
-                        {dog.dogId || "DOG-1234"}
+                        Print with Dog ID: {dog.dogId || "DOG-1234"}
                       </p>
                     </div>
                   </div>

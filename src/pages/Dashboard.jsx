@@ -382,10 +382,10 @@ function Dashboard() {
               <div className="flex items-center justify-between gap-4 rounded-3xl border border-sky-100 bg-gradient-to-r from-sky-50 to-emerald-50 p-4">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                    Open profile
+                    Universal lookup QR
                   </p>
                   <p className="mt-2 text-sm font-medium text-slate-900">
-                    View details and health history
+                    Pair this shared QR with Dog ID {dog.dogId || "DOG-1234"}
                   </p>
                 </div>
                 {dog.qrCode && (

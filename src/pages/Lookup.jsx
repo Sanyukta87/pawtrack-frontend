@@ -21,6 +21,9 @@ const getPlaceNameFromAddress = (address = {}) =>
     .slice(0, 2)
     .join(", ");
 
+const formatLookupDate = (value) =>
+  value ? new Date(value).toLocaleDateString() : "Not available";
+
 function Lookup() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [dogId, setDogId] = useState(searchParams.get("dogId") || "");
@@ -257,15 +260,66 @@ function Lookup() {
             </div>
 
             <LookupField label="Dog ID" value={dog.dogId} />
-            <LookupField label="Location" value={dog.location || "Not available"} />
+            <LookupField
+              label="Last Seen Location"
+              value={dog.lastSeenLocation || "Not available"}
+            />
             <LookupField
               label="Vaccination Status"
               value={dog.vaccinationStatusLabel}
             />
             <LookupField
+              label="Neutering Status"
+              value={dog.neuteringStatusLabel}
+            />
+            <LookupField
               label="Important Notes"
               value={dog.notes || "No notes available"}
             />
+            <LookupField
+              label="Last Shared Update"
+              value={formatLookupDate(dog.lastSeenTimestamp)}
+            />
+
+            <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">
+                Health Records
+              </p>
+              {dog.healthRecords?.length ? (
+                <div className="mt-3 space-y-3">
+                  {dog.healthRecords.map((record, index) => (
+                    <div
+                      className="rounded-2xl border border-slate-200/70 bg-white/90 p-4"
+                      key={`${record.createdAt || index}-${record.type}`}
+                    >
+                      <p className="text-sm font-semibold text-slate-900">
+                        {record.type === "vaccination"
+                          ? "Vaccination"
+                          : record.treatment || "Treatment"}
+                      </p>
+                      <p className="mt-1 text-sm text-slate-600">
+                        {record.notes || "No additional notes"}
+                      </p>
+                      <p className="mt-2 text-xs font-medium text-slate-500">
+                        Recorded:{" "}
+                        {formatLookupDate(
+                          record.vaccinationDate || record.createdAt
+                        )}
+                      </p>
+                      {record.nextDueDate && (
+                        <p className="mt-1 text-xs font-medium text-slate-500">
+                          Next due: {formatLookupDate(record.nextDueDate)}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-3 text-sm text-slate-500">
+                  No public health records available yet.
+                </p>
+              )}
+            </div>
 
             {locationReady && !loggedDogIdsRef.current.has(dog.dogId) && (
               <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4">

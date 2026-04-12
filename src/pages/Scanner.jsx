@@ -5,14 +5,35 @@ import { useTheme } from "../context/ThemeContext";
 
 const normalizeDogId = (value) => value.trim().toUpperCase();
 
-const extractDogId = (decodedText) => {
+const getScanDestination = (decodedText) => {
   const trimmedValue = decodedText.trim();
 
-  if (trimmedValue.includes("/dog/")) {
-    return normalizeDogId(trimmedValue.split("/dog/").pop() || "");
+  try {
+    const parsedUrl = new URL(trimmedValue);
+
+    if (parsedUrl.pathname.includes("/lookup")) {
+      const scannedDogId = normalizeDogId(
+        parsedUrl.searchParams.get("dogId") || ""
+      );
+
+      return scannedDogId
+        ? `/lookup?dogId=${encodeURIComponent(scannedDogId)}`
+        : "/lookup";
+    }
+
+    if (parsedUrl.pathname.includes("/dog/")) {
+      const scannedDogId = normalizeDogId(
+        parsedUrl.pathname.split("/dog/").pop() || ""
+      );
+
+      return scannedDogId ? `/dog/${scannedDogId}` : "";
+    }
+  } catch (error) {
+    // Non-URL QR payloads fall through to direct Dog ID parsing.
   }
 
-  return normalizeDogId(trimmedValue);
+  const scannedDogId = normalizeDogId(trimmedValue);
+  return scannedDogId ? `/dog/${scannedDogId}` : "";
 };
 
 function Scanner() {
@@ -44,15 +65,15 @@ function Scanner() {
           return;
         }
 
-        const scannedDogId = extractDogId(decodedText);
+        const destination = getScanDestination(decodedText);
 
-        if (!scannedDogId) {
-          setScanError("Scanned QR is not a valid dog ID.");
+        if (!destination) {
+          setScanError("Scanned QR is not a valid PawTrack code.");
           return;
         }
 
         hasNavigatedRef.current = true;
-        navigate(`/dog/${scannedDogId}`);
+        navigate(destination);
       };
 
       try {
@@ -75,7 +96,7 @@ function Scanner() {
         }
 
         setScanError("");
-        setScanStatus("Point your camera at the dog's QR code.");
+        setScanStatus("Point your camera at the PawTrack QR code.");
       } catch (initialError) {
         try {
           const devices = await Html5Qrcode.getCameras();
@@ -108,7 +129,7 @@ function Scanner() {
           }
 
           setScanError("");
-          setScanStatus("Point your camera at the dog's QR code.");
+          setScanStatus("Point your camera at the PawTrack QR code.");
         } catch (fallbackError) {
           console.error(fallbackError);
 
@@ -193,8 +214,8 @@ function Scanner() {
             Find a PawTrack dog by ID or QR
           </h1>
           <p style={{ color: darkMode ? "#94a3b8" : "#64748b", lineHeight: 1.7 }}>
-            Enter a unique dog ID manually or scan the QR code to open the
-            matching profile instantly.
+            Enter a unique dog ID manually or scan the universal PawTrack QR to
+            open the lookup flow instantly.
           </p>
 
           <form onSubmit={handleSubmit} style={{ marginTop: "18px" }}>
