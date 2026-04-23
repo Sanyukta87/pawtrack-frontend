@@ -53,7 +53,7 @@ function DogsPage() {
             <span className="section-chip">Directory</span>
             <h1 className="section-heading mt-3">Dogs Directory</h1>
             <p className="section-copy mt-2">
-              Browse dog IDs, vaccination status, and the shared lookup QR in one place.
+              Browse dog IDs and vaccination status in one place.
             </p>
           </div>
 
@@ -111,26 +111,6 @@ function DogsPage() {
                   <Badge variant="danger">Attention</Badge>
                 )}
               </div>
-
-              {dog.qrCode && (
-                <div className="rounded-3xl border border-sky-100 bg-gradient-to-r from-sky-50 to-emerald-50 p-4">
-                  <div className="flex items-center gap-4">
-                    <img
-                      alt={`${dog.name} QR`}
-                      className="h-24 w-24 rounded-2xl bg-white p-2 shadow-sm"
-                      src={dog.qrCode}
-                    />
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900">
-                        Universal lookup QR
-                      </p>
-                      <p className="mt-1 text-xs text-slate-500">
-                        Print with Dog ID: {dog.dogId || "DOG-1234"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
 
               <div className="mt-auto flex justify-end">
                 <Button onClick={() => navigate(`/dog/${getDogRouteId(dog)}`)}>

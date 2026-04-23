@@ -8,7 +8,6 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import AddDog from "./pages/AddDog";
 import DogDetails from "./pages/DogDetails";
-import Scanner from "./pages/Scanner";
 import DogsPage from "./pages/DogsPage";
 import Lookup from "./pages/Lookup";
 import VerifyEmail from "./pages/VerifyEmail";
@@ -88,14 +87,6 @@ function App() {
           }
         />
         <Route path="/lookup" element={<Lookup />} />
-        <Route
-          path="/scan"
-          element={
-            <ProtectedRoute allowedRoles={["admin", "vet"]}>
-              <Scanner />
-            </ProtectedRoute>
-          }
-        />
         <Route path="/alerts" element={<div>Alerts Page</div>} />
       </Routes>
     </BrowserRouter>

@@ -206,18 +206,6 @@ function DogDetails() {
               />
             </div>
 
-            <div className="rounded-3xl border border-sky-100 bg-gradient-to-b from-sky-50 to-emerald-50 p-5 text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">
-                QR Code
-              </p>
-              {dog.qrCode && (
-                <img
-                  alt={`${dog.name} QR`}
-                  className="mx-auto mt-4 h-48 w-48 rounded-2xl bg-white p-4 shadow-sm"
-                  src={dog.qrCode}
-                />
-              )}
-            </div>
           </Card>
 
           <Card className="space-y-4 border-amber-100/70 bg-white/88">

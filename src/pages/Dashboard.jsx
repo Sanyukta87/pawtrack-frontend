@@ -165,9 +165,6 @@ function Dashboard() {
                 <Button type="submit" variant="secondary">
                   Find Dog
                 </Button>
-                <Button onClick={() => navigate("/scan")} variant="secondary">
-                  Open Scanner
-                </Button>
                 {role === "admin" && (
                   <Button onClick={() => navigate("/add-dog")}>Add Dog</Button>
                 )}
@@ -377,24 +374,6 @@ function Dashboard() {
                 <Badge variant={dog.sterilized ? "info" : "neutral"}>
                   {dog.sterilized ? "Sterilized" : "Not Sterilized"}
                 </Badge>
-              </div>
-
-              <div className="flex items-center justify-between gap-4 rounded-3xl border border-sky-100 bg-gradient-to-r from-sky-50 to-emerald-50 p-4">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                    Universal lookup QR
-                  </p>
-                  <p className="mt-2 text-sm font-medium text-slate-900">
-                    Pair this shared QR with Dog ID {dog.dogId || "DOG-1234"}
-                  </p>
-                </div>
-                {dog.qrCode && (
-                  <img
-                    alt={`${dog.name} QR`}
-                    className="h-20 w-20 rounded-2xl bg-white p-2 shadow-sm"
-                    src={dog.qrCode}
-                  />
-                )}
               </div>
 
               <div className="mt-auto flex justify-end">
